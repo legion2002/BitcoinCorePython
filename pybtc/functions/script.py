@@ -1,5 +1,4 @@
 from struct import unpack
-from pyflo.pyflo.pybtc.functions.key import private_key_to_wif
 from secp256k1 import ffi, lib, ECDSA, PrivateKey, PublicKey
 
 secp256k1_ecdsa_signature_parse_der = lib.secp256k1_ecdsa_signature_parse_der
@@ -22,7 +21,7 @@ from pybtc.constants import *
 from pybtc.functions.tools import bytes_from_hex, int_to_bytes, get_stream
 from pybtc.functions.hash import hash160, sha256
 from pybtc.functions.address import hash_to_address
-from pybtc.functions.key import is_wif_valid, wif_to_private_key
+from pybtc.functions.key import is_wif_valid, wif_to_private_key, private_key_to_wif
 from ellipticcurve.signature import Signature
 from ellipticcurve.ecdsa import Ecdsa
 from ellipticcurve.privateKey import PrivateKey
@@ -463,14 +462,12 @@ def verify_signature(sig, pub_key, msg):
 
 
 def test_function():
-    wif = private_key_to_wif(
-        hex(
-            50538546016866556721350668740308637371579867695827585721431652202084429868552
-        )
-    )
+    print()
+    wif = private_key_to_wif("6fbbcda9535afd31afda62bfb7f44bbe76f24e22f67c69d9314ad35e0f322e08")
+    
     print("wif = " + wif)
-    hex = wif_to_private_key(wif)
-    print(hex)
+    hex1 = wif_to_private_key(wif)
+    print(hex1)
 
 
 def sign_message_tanishk(msg, private_key, hex=True):
@@ -479,9 +476,9 @@ def sign_message_tanishk(msg, private_key, hex=True):
     print("HEX = " + hex)
     # {floID: 'FTR2ow2o9dsnQPoFMhLi1XWXncxaJU2eVW', pubKey: '028D663FDA1A9224F5493C78F4C4D6FCAFFF5FEEC27DB871EE1702705D334613B9', privKey: 'RBFyY5CT65nFp6uz7Kjv9uyP9V2pZuXEZwL4KZvB5tdCw249o7Ew', numPriv: '50538546016866556721350668740308637371579867695827585721431652202084429868552'}
     pk = PrivateKey.fromString(hex)
-    pk = PrivateKey(
-        secret=50538546016866556721350668740308637371579867695827585721431652202084429868552
-    )
+    # pk = PrivateKey(
+    #     secret=50538546016866556721350668740308637371579867695827585721431652202084429868552
+    # )
     # hex = "6FBBCDA9535AFD31AFDA62BFB7F44BBE76F24E22F67C69D9314AD35E0F322E08"
     print("SECRET = " + str(pk.secret))
     # print("PRIVATE = " + pk.toString())
