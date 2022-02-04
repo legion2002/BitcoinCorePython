@@ -25,6 +25,12 @@ from pybtc.functions.key import is_wif_valid, wif_to_private_key, private_key_to
 from ellipticcurve.signature import Signature
 from ellipticcurve.ecdsa import Ecdsa
 from ellipticcurve.privateKey import PrivateKey
+from ellipticcurve.math import Math
+from ellipticcurve.utils.integer import RandomInteger
+from ellipticcurve.utils.binary import numberFromByteString
+from ellipticcurve.utils.compatibility import *
+
+
 
 
 def public_key_to_pubkey_script(key, hex=True):
@@ -469,16 +475,26 @@ def test_function():
     hex1 = wif_to_private_key(wif)
     print(hex1)
 
-from hashlib import sha256
+import hashlib
 
 def modSign( message, privateKey, hashfunc=sha256):
-    byteMessage = hashfunc(toBytes(message)).digest()
-    numberMessage = numberFromByteString(byteMessage)
+    # byteMessage = toBytes(message).digest()
+    # byteMessage = hashfunc(toBytes(message)).digest()
+    
+    byteMessage = hashlib.sha256(message.encode('utf-8')).hexdigest()
+    # byteMessage = '0x' + byteMessage
+
+    # byteMessage = script_to_hash("686579", True)
+    print("Message Hash = " + str(byteMessage))
+    numberMessage = int(byteMessage, base=16)
+    print("Message Number = " + str(numberMessage))
+    numberMessage = 16069118206254632852630152090897815844163178320802912732062591204
     curve = privateKey.curve
 
     r, s, randSignPoint = 0, 0, None
     while r == 0 or s == 0:
-        randNum = RandomInteger.between(1, curve.N - 1)
+        # randNum = RandomInteger.between(1, curve.N - 1)
+        randNum = 100
         randSignPoint = Math.multiply(curve.G, n=randNum, A=curve.A, P=curve.P, N=curve.N)
         r = randSignPoint.x % curve.N
         s = ((numberMessage + r * privateKey.secret) * (Math.inv(randNum, curve.N))) % curve.N
@@ -486,7 +502,7 @@ def modSign( message, privateKey, hashfunc=sha256):
     if randSignPoint.y > curve.N:
         recoveryId += 2
 
-    return ECDSA.Signature(r=r, s=s, recoveryId=recoveryId)
+    return Signature(r=r, s=s, recoveryId=recoveryId)
 #{floID: 'FV7zHQ4xeATQPUPGSXbRsPyDKaRPT8z9ch', 
 # pubKey: '032DDE39DD45E4A0A652B3D4CEA6CBB7A56CC43EEDA00A8B32EDE749D957FF3A16', 
 # privKey: 'RFGCffC1fr4wqr1yV7u5KZ4ctLktEMf7fFPmN7LrZUJzsx52cvzm', 
