@@ -12,6 +12,6 @@ import pybtc
 # b = pybtc.verify_signature(a, public, "6865790D0A")
 # print(b)
 # pybtc.test_function()
-pk = "RBFyY5CT65nFp6uz7Kjv9uyP9V2pZuXEZwL4KZvB5tdCw249o7Ew"
+pk = "RFGCffC1fr4wqr1yV7u5KZ4ctLktEMf7fFPmN7LrZUJzsx52cvzm"
 a = pybtc.sign_message_tanishk("hey", pk, hex=True)
 # RBFyY5CT65nFp6uz7Kjv9uyP9V2pZuXEZwL4KZvB5tdCw249o7Ew

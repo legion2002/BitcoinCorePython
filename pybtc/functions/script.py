@@ -469,24 +469,43 @@ def test_function():
     hex1 = wif_to_private_key(wif)
     print(hex1)
 
+from hashlib import sha256
+
+def modSign( message, privateKey, hashfunc=sha256):
+    byteMessage = hashfunc(toBytes(message)).digest()
+    numberMessage = numberFromByteString(byteMessage)
+    curve = privateKey.curve
+
+    r, s, randSignPoint = 0, 0, None
+    while r == 0 or s == 0:
+        randNum = RandomInteger.between(1, curve.N - 1)
+        randSignPoint = Math.multiply(curve.G, n=randNum, A=curve.A, P=curve.P, N=curve.N)
+        r = randSignPoint.x % curve.N
+        s = ((numberMessage + r * privateKey.secret) * (Math.inv(randNum, curve.N))) % curve.N
+    recoveryId = randSignPoint.y & 1
+    if randSignPoint.y > curve.N:
+        recoveryId += 2
+
+    return ECDSA.Signature(r=r, s=s, recoveryId=recoveryId)
+#{floID: 'FV7zHQ4xeATQPUPGSXbRsPyDKaRPT8z9ch', 
+# pubKey: '032DDE39DD45E4A0A652B3D4CEA6CBB7A56CC43EEDA00A8B32EDE749D957FF3A16', 
+# privKey: 'RFGCffC1fr4wqr1yV7u5KZ4ctLktEMf7fFPmN7LrZUJzsx52cvzm', 
+# numPriv: '104574576087683486847995456936233568908389625299457839251220264392921203285909'}
 
 def sign_message_tanishk(msg, private_key, hex=True):
     print(is_wif_valid(private_key))
     hex = wif_to_private_key(private_key)
+
     print("HEX = " + hex)
-    # {floID: 'FTR2ow2o9dsnQPoFMhLi1XWXncxaJU2eVW', pubKey: '028D663FDA1A9224F5493C78F4C4D6FCAFFF5FEEC27DB871EE1702705D334613B9', privKey: 'RBFyY5CT65nFp6uz7Kjv9uyP9V2pZuXEZwL4KZvB5tdCw249o7Ew', numPriv: '50538546016866556721350668740308637371579867695827585721431652202084429868552'}
     pk = PrivateKey.fromString(hex)
-    # pk = PrivateKey(
-    #     secret=50538546016866556721350668740308637371579867695827585721431652202084429868552
-    # )
-    # hex = "6FBBCDA9535AFD31AFDA62BFB7F44BBE76F24E22F67C69D9314AD35E0F322E08"
     print("SECRET = " + str(pk.secret))
-    # print("PRIVATE = " + pk.toString())
-    signature = Ecdsa.sign(msg, pk)
+    # msg = Ecdsasha256(msg)
+    signature = modSign(msg, pk)
     print("R = " + str(signature.r))
     print("S = " + str(signature.s))
 
     return signature._toString()
+
 
 
 def sign_message(msg, private_key, hex=True):
