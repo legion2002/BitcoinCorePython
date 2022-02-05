@@ -1,5 +1,7 @@
 from struct import unpack
-from secp256k1 import ffi, lib, ECDSA, PrivateKey, PublicKey
+from secp256k1 import ffi, lib, PrivateKey
+import hashlib
+
 
 secp256k1_ecdsa_signature_parse_der = lib.secp256k1_ecdsa_signature_parse_der
 secp256k1_ec_pubkey_parse = lib.secp256k1_ec_pubkey_parse
@@ -465,17 +467,6 @@ def verify_signature(sig, pub_key, msg):
     return True if result else False
 
 
-def test_function():
-    print()
-    wif = private_key_to_wif(
-        "6fbbcda9535afd31afda62bfb7f44bbe76f24e22f67c69d9314ad35e0f322e08"
-    )
-
-    print("wif = " + wif)
-    hex1 = wif_to_private_key(wif)
-    print(hex1)
-
-
 def to_base(n, base):
     if base == 10:
         return n
@@ -489,9 +480,9 @@ def to_base(n, base):
     return result
 
 
-import hashlib
 
 
+# https://raw.githubusercontent.com/starkbank/ecdsa-python/master/ellipticcurve/ecdsa.py
 def modSign(message, privateKey, hashfunc=sha256):
     # byteMessage = toBytes(message).digest()
     # byteMessage = hashfunc(toBytes(message)).digest()
@@ -500,18 +491,12 @@ def modSign(message, privateKey, hashfunc=sha256):
     # byteMessage = '0x' + byteMessage
 
     # byteMessage = script_to_hash("686579", True)
-    print("Message Hash = " + str(byteMessage))
     numberMessage = int(byteMessage, base=16)
     numberMessage = to_base(numberMessage, 16)
-
-    print("Message Number = " + str(numberMessage))
-    # numberMessage = 16069118206254632852630152090897815844163178320802912732062591204
     curve = privateKey.curve
-
     r, s, randSignPoint = 0, 0, None
     while r == 0 or s == 0:
-        # randNum = RandomInteger.between(1, curve.N - 1)
-        randNum = 100
+        randNum = RandomInteger.between(1, curve.N - 1)
         randSignPoint = Math.multiply(
             curve.G, n=randNum, A=curve.A, P=curve.P, N=curve.N
         )
@@ -533,18 +518,22 @@ def modSign(message, privateKey, hashfunc=sha256):
 
 
 def sign_message_tanishk(msg, private_key, hex2=True):
-    print(is_wif_valid(private_key))
-    hex1 = wif_to_private_key(private_key)
-
-    print("HEX = " + hex1)
+    
+    if(is_wif_valid(private_key)):
+        hex1 = wif_to_private_key(private_key)
+    else:
+        raise TypeError("Invalid Private_Key, must be in WIF format")
     pk = PrivateKey.fromString(hex1)
-    print("SECRET = " + str(pk.secret))
-    # msg = Ecdsasha256(msg)
     signature = modSign(msg, pk)
-    print("R = " + str(signature.r))
-    print("S = " + str(signature.s))
+
+    # print("HEX = " + hex1)
+    # print("SECRET = " + str(pk.secret))
+    # msg = Ecdsasha256(msg)
+    # print("R = " + str(signature.r))
+    # print("S = " + str(signature.s))
+    print(signature._toString())
     a = int.from_bytes(signature.toDer(), 'big')
-    return hex(a)
+    return hex(a)[2:]
 
 def sign_message(msg, private_key, hex=True):
     """
