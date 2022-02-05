@@ -13,5 +13,6 @@ import pybtc
 # print(b)
 # pybtc.test_function()
 pk = "RFGCffC1fr4wqr1yV7u5KZ4ctLktEMf7fFPmN7LrZUJzsx52cvzm"
-a = pybtc.sign_message_tanishk("hey", pk, hex=True)
+a = pybtc.sign_message_tanishk("hey", pk, hex2=True)
+print(a)
 # RBFyY5CT65nFp6uz7Kjv9uyP9V2pZuXEZwL4KZvB5tdCw249o7Ew

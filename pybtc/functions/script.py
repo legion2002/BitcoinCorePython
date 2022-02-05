@@ -31,8 +31,6 @@ from ellipticcurve.utils.binary import numberFromByteString
 from ellipticcurve.utils.compatibility import *
 
 
-
-
 def public_key_to_pubkey_script(key, hex=True):
     if isinstance(key, str):
         key = bytes_from_hex(key)
@@ -469,60 +467,84 @@ def verify_signature(sig, pub_key, msg):
 
 def test_function():
     print()
-    wif = private_key_to_wif("6fbbcda9535afd31afda62bfb7f44bbe76f24e22f67c69d9314ad35e0f322e08")
-    
+    wif = private_key_to_wif(
+        "6fbbcda9535afd31afda62bfb7f44bbe76f24e22f67c69d9314ad35e0f322e08"
+    )
+
     print("wif = " + wif)
     hex1 = wif_to_private_key(wif)
     print(hex1)
 
+
+def to_base(n, base):
+    if base == 10:
+        return n
+    result = 0
+    counter = 0
+    while n:
+        r = n % base
+        n //= base
+        result += r * 10 ** counter
+        counter += 1
+    return result
+
+
 import hashlib
 
-def modSign( message, privateKey, hashfunc=sha256):
+
+def modSign(message, privateKey, hashfunc=sha256):
     # byteMessage = toBytes(message).digest()
     # byteMessage = hashfunc(toBytes(message)).digest()
-    
-    byteMessage = hashlib.sha256(message.encode('utf-8')).hexdigest()
+
+    byteMessage = hashlib.sha256(message.encode("utf-8")).hexdigest()
     # byteMessage = '0x' + byteMessage
 
     # byteMessage = script_to_hash("686579", True)
     print("Message Hash = " + str(byteMessage))
     numberMessage = int(byteMessage, base=16)
+    numberMessage = to_base(numberMessage, 16)
+
     print("Message Number = " + str(numberMessage))
-    numberMessage = 16069118206254632852630152090897815844163178320802912732062591204
+    # numberMessage = 16069118206254632852630152090897815844163178320802912732062591204
     curve = privateKey.curve
 
     r, s, randSignPoint = 0, 0, None
     while r == 0 or s == 0:
         # randNum = RandomInteger.between(1, curve.N - 1)
         randNum = 100
-        randSignPoint = Math.multiply(curve.G, n=randNum, A=curve.A, P=curve.P, N=curve.N)
+        randSignPoint = Math.multiply(
+            curve.G, n=randNum, A=curve.A, P=curve.P, N=curve.N
+        )
         r = randSignPoint.x % curve.N
-        s = ((numberMessage + r * privateKey.secret) * (Math.inv(randNum, curve.N))) % curve.N
+        s = (
+            (numberMessage + r * privateKey.secret) * (Math.inv(randNum, curve.N))
+        ) % curve.N
     recoveryId = randSignPoint.y & 1
     if randSignPoint.y > curve.N:
         recoveryId += 2
 
     return Signature(r=r, s=s, recoveryId=recoveryId)
-#{floID: 'FV7zHQ4xeATQPUPGSXbRsPyDKaRPT8z9ch', 
-# pubKey: '032DDE39DD45E4A0A652B3D4CEA6CBB7A56CC43EEDA00A8B32EDE749D957FF3A16', 
-# privKey: 'RFGCffC1fr4wqr1yV7u5KZ4ctLktEMf7fFPmN7LrZUJzsx52cvzm', 
+
+
+# {floID: 'FV7zHQ4xeATQPUPGSXbRsPyDKaRPT8z9ch',
+# pubKey: '032DDE39DD45E4A0A652B3D4CEA6CBB7A56CC43EEDA00A8B32EDE749D957FF3A16',
+# privKey: 'RFGCffC1fr4wqr1yV7u5KZ4ctLktEMf7fFPmN7LrZUJzsx52cvzm',
 # numPriv: '104574576087683486847995456936233568908389625299457839251220264392921203285909'}
 
-def sign_message_tanishk(msg, private_key, hex=True):
-    print(is_wif_valid(private_key))
-    hex = wif_to_private_key(private_key)
 
-    print("HEX = " + hex)
-    pk = PrivateKey.fromString(hex)
+def sign_message_tanishk(msg, private_key, hex2=True):
+    print(is_wif_valid(private_key))
+    hex1 = wif_to_private_key(private_key)
+
+    print("HEX = " + hex1)
+    pk = PrivateKey.fromString(hex1)
     print("SECRET = " + str(pk.secret))
     # msg = Ecdsasha256(msg)
     signature = modSign(msg, pk)
     print("R = " + str(signature.r))
     print("S = " + str(signature.s))
-
-    return signature._toString()
-
-
+    a = int.from_bytes(signature.toDer(), 'big')
+    return hex(a)
 
 def sign_message(msg, private_key, hex=True):
     """
