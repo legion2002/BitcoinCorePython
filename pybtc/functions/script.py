@@ -27,6 +27,8 @@ from pybtc.functions.key import is_wif_valid, wif_to_private_key, private_key_to
 from ellipticcurve.signature import Signature
 from ellipticcurve.ecdsa import Ecdsa
 from ellipticcurve.privateKey import PrivateKey
+from ellipticcurve.publicKey import PublicKey
+
 from ellipticcurve.math import Math
 from ellipticcurve.utils.integer import RandomInteger
 from ellipticcurve.utils.binary import numberFromByteString
@@ -489,7 +491,7 @@ def modSign(message, privateKey, hashfunc=sha256):
 
     byteMessage = hashlib.sha256(message.encode("utf-8")).hexdigest()
     # byteMessage = '0x' + byteMessage
-
+    
     # byteMessage = script_to_hash("686579", True)
     numberMessage = int(byteMessage, base=16)
     numberMessage = to_base(numberMessage, 16)
@@ -534,6 +536,16 @@ def sign_message_tanishk(msg, private_key, hex2=True):
     print(signature._toString())
     a = int.from_bytes(signature.toDer(), 'big')
     return hex(a)[2:]
+def verify_message_tanishk(msg, signature, pub):
+    byteMessage = hashlib.sha256(msg.encode("utf-8")).hexdigest()
+    # byteMessage = '0x' + byteMessage
+    # sig = bytes.fromhex(signature)
+    sign = Signature._fromString(signature)
+    pub = PublicKey.fromString(pub)
+    print(Ecdsa.verify(msg, sign, pub))
+    # byteMessage = script_to_hash("686579", True)
+    numberMessage = int(byteMessage, base=16)
+    numberMessage = to_base(numberMessage, 16)
 
 def sign_message(msg, private_key, hex=True):
     """
