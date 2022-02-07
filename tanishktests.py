@@ -16,5 +16,5 @@ public = pybtc.private_to_public_key(pk)
 print("public = " + public)
 
 a = pybtc.sign_message_tanishk(msg, pk, hex2=True)
-# pybtc.verify_message_tanishk(msg , a, public)
+pybtc.verify_message_tanishk(msg , a, public)
 # RBFyY5CT65nFp6uz7Kjv9uyP9V2pZuXEZwL4KZvB5tdCw249o7Ew

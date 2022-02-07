@@ -33,6 +33,8 @@ from ellipticcurve.math import Math
 from ellipticcurve.utils.integer import RandomInteger
 from ellipticcurve.utils.binary import numberFromByteString
 from ellipticcurve.utils.compatibility import *
+import ellipticcurve.utils.der as der
+
 
 
 def public_key_to_pubkey_script(key, hex=True):
@@ -541,7 +543,9 @@ def verify_message_tanishk(msg, signature, pub):
     # byteMessage = '0x' + byteMessage
     # sig = bytes.fromhex(signature)
     sign = Signature._fromString(signature)
-    pub = PublicKey.fromString(pub)
+    hold = der.parse(pub)
+    pub = PublicKey.fromDer(hold)
+    
     print(Ecdsa.verify(msg, sign, pub))
     # byteMessage = script_to_hash("686579", True)
     numberMessage = int(byteMessage, base=16)
